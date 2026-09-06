@@ -1,0 +1,3 @@
+export const apiExample = JSON.stringify({ resources: { products: { schema: { id: 'uuid', name: 'productName', price: 'price', stock: 'integer', active: 'boolean' }, generate: 20 } }, endpoints: { health: { method: 'GET', path: '/api/health', response: { ok: true } } } }, null, 2) + '\n';
+export const configExample = JSON.stringify({ port: 4000, basePath: '/api', defaultLimit: 20 }, null, 2) + '\n';
+export const readmeExample = '# ApiMoq project\n\nEdit `api.json` to define resources and endpoints. Then run:\n\n`npx apimoq generate`\n`npx apimoq dev`\n\nSchemas support primitives, Faker aliases, enums, fixed values, mock values, arrays, and nested objects. Resource records are persisted in `data.json`.\n';

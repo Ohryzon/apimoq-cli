@@ -1,0 +1,20 @@
+#!/usr/bin/env node
+import { mkdir, access, writeFile } from 'node:fs/promises';
+import readline from 'node:readline/promises';
+import { stdin as input, stdout as output } from 'node:process';
+import { Command } from 'commander';
+import { loadConfig, loadJson, validateContract } from '../config/config.js';
+import { projectPaths } from '../shared/paths.js';
+import { apiExample, configExample, readmeExample } from '../templates/templates.js';
+import { JsonStore } from '../storage/json-store.js';
+import { createApiServer, seedData } from '../http/server.js';
+import { setGenerationSeed } from '../schema/schema.js';
+
+async function project(cwd = process.cwd()) { const paths = projectPaths(cwd); const contract = validateContract(await loadJson<unknown>(paths.api)); const config = await loadConfig(paths.config); return { paths, contract, config, store: new JsonStore(paths.data) }; }
+const program = new Command().name('apimoq').description('A persistent local API simulator').version('0.1.0');
+program.command('init').action(async () => { const p = projectPaths(); try { await access(p.dir); throw new Error(`${p.dir} already exists; refusing to overwrite`); } catch (e: any) { if (e.message.includes('refusing')) throw e; } await mkdir(p.dir); await writeFile(p.api, apiExample); await writeFile(p.data, '{}\n'); await writeFile(p.config, configExample); await writeFile(p.readme, readmeExample); console.log('Created .apimoq/'); });
+program.command('generate').argument('[resource]').option('--yes', 'replace existing records without prompting').action(async (resource, options) => { const p = await project(); const names = resource ? [resource] : Object.keys(p.contract.resources ?? {}); for (const name of names) if (!p.contract.resources?.[name]) throw new Error(`Unknown resource: ${name}`); const existing = await p.store.load(); if (!options.yes && names.some(name => (existing[name] ?? []).length > 0)) { if (!process.stdin.isTTY) throw new Error('Existing records found; rerun interactively or use --yes'); const prompt = readline.createInterface({ input, output }); const answer = await prompt.question('Replace existing generated records? [y/N] '); prompt.close(); if (!/^y(es)?$/i.test(answer.trim())) { console.log('Generation cancelled'); return; } } setGenerationSeed(p.config.seed); await seedData(p.contract, p.store, names); console.log(`Generated ${names.join(', ')}`); });
+program.command('reset').action(async () => { const p = await project(); await p.store.save({}); console.log('Reset .apimoq/data.json'); });
+program.command('inspect').action(async () => { const p = await project(), data = await p.store.load(); console.log('Resources'); for (const name of Object.keys(p.contract.resources ?? {})) console.log(`  ${name}   ${(data[name] ?? []).length} records`); console.log('\nEndpoints'); for (const route of Object.values(p.contract.endpoints ?? {})) console.log(`  ${route.method.toUpperCase()}   ${route.path}`); });
+program.command('dev').option('--port <number>').action(async options => { const p = await project(), port = options.port ? Number(options.port) : p.config.port; if (!Number.isInteger(port) || port < 1 || port > 65535) throw new Error('Port must be an integer between 1 and 65535'); const server = createApiServer(p.contract, { ...p.config, port }, p.store); server.listen({ port, host: '127.0.0.1' }, () => { console.log(`ApiMoq\n\n  Server:  http://localhost:${port}\n  Data:    ${p.paths.data}\n  Config:  ${p.paths.config}\n\nEndpoints`); for (const resource of Object.keys(p.contract.resources ?? {})) console.log(`\n  GET     ${p.config.basePath}/${resource}\n  GET     ${p.config.basePath}/${resource}/:id\n  POST    ${p.config.basePath}/${resource}\n  PATCH   ${p.config.basePath}/${resource}/:id\n  DELETE  ${p.config.basePath}/${resource}/:id`); for (const endpoint of Object.values(p.contract.endpoints ?? {})) console.log(`\n  ${endpoint.method.toUpperCase()}     ${endpoint.path}`); }); });
+program.parseAsync().catch(error => { console.error(`Error: ${(error as Error).message}`); process.exitCode = 1; });

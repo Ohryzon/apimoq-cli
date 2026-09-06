@@ -1,0 +1,38 @@
+{
+  "name": "apimoq-cli",
+  "version": "0.1.0",
+  "description": "A lightweight, persistent local API simulator for frontend development.",
+  "license": "MIT",
+  "repository": { "type": "git", "url": "git+ssh://git@github.com/Ohryzon/apimoq-cli.git" },
+  "homepage": "https://github.com/Ohryzon/apimoq-cli#readme",
+  "bugs": { "url": "https://github.com/Ohryzon/apimoq-cli/issues" },
+  "keywords": ["api", "mock", "mock-server", "frontend", "cli", "development"],
+  "publishConfig": { "access": "public", "provenance": true },
+  "type": "module",
+  "bin": { "apimoq": "./dist/cli/index.js" },
+  "files": ["dist", "templates"],
+  "scripts": {
+    "clean": "rimraf dist",
+    "build": "npm run clean && tsc -p tsconfig.json",
+    "dev": "tsx src/cli/index.ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "check": "npm run build && npm test",
+    "audit:ci": "npm audit --audit-level=high",
+    "pack:ci": "npm pack --dry-run",
+    "prepublishOnly": "npm run build"
+  },
+  "engines": { "node": ">=20" },
+  "dependencies": {
+    "@faker-js/faker": "^10.6.0",
+    "commander": "^12.1.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "rimraf": "^6.0.1",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0",
+    "vitest": "^5.0.0"
+  }
+}

@@ -1,16 +1,35 @@
 {
   "name": "apimoq-cli",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A lightweight, persistent local API simulator for frontend development.",
   "license": "MIT",
-  "repository": { "type": "git", "url": "git+ssh://git@github.com/Ohryzon/apimoq-cli.git" },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/Ohryzon/apimoq-cli.git"
+  },
   "homepage": "https://github.com/Ohryzon/apimoq-cli#readme",
-  "bugs": { "url": "https://github.com/Ohryzon/apimoq-cli/issues" },
-  "keywords": ["api", "mock", "mock-server", "frontend", "cli", "development"],
-  "publishConfig": { "access": "public" },
+  "bugs": {
+    "url": "https://github.com/Ohryzon/apimoq-cli/issues"
+  },
+  "keywords": [
+    "api",
+    "mock",
+    "mock-server",
+    "frontend",
+    "cli",
+    "development"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "type": "module",
-  "bin": { "apimoq": "./dist/cli/index.js" },
-  "files": ["dist", "templates"],
+  "bin": {
+    "apimoq": "./dist/cli/index.js"
+  },
+  "files": [
+    "dist",
+    "templates"
+  ],
   "scripts": {
     "clean": "rimraf dist",
     "build": "npm run clean && tsc -p tsconfig.json",
@@ -22,7 +41,9 @@
     "pack:ci": "npm pack --dry-run",
     "prepublishOnly": "npm run build"
   },
-  "engines": { "node": ">=20" },
+  "engines": {
+    "node": ">=20"
+  },
   "dependencies": {
     "@faker-js/faker": "^10.6.0",
     "commander": "^12.1.0",

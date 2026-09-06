@@ -40,12 +40,24 @@ The CLI is designed for local development and is not a production HTTP server.
 
 ## Quick start
 
+Install the CLI globally:
+
+```bash
+npm install --global apimoq-cli
+```
+
+Or run it without a global installation:
+
+```bash
+npx apimoq-cli init
+```
+
 From the application directory that should contain the local contract:
 
 ```bash
-npx apimoq init
-npx apimoq generate
-npx apimoq dev
+apimoq init
+apimoq generate
+apimoq dev
 ```
 
 The server starts at `http://localhost:4000`. The generated example exposes `GET /api/products`.

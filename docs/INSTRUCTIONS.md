@@ -126,7 +126,9 @@ The workflow validates the tag, checks the package version, installs locked depe
 
 ## Future releases
 
-Start from an updated clean branch:
+Because `main` is protected, version changes must be submitted through a pull request. Do not bump the version directly on `main` and do not push release tags before the version change has been merged.
+
+### 1. Start from updated `main`
 
 ```bash
 git checkout main
@@ -134,7 +136,17 @@ git pull --ff-only origin main
 git status
 ```
 
-Run the checks:
+The working tree must be clean.
+
+### 2. Create a release branch
+
+Use the version you intend to release in the branch name:
+
+```bash
+git checkout -b release/0.1.2
+```
+
+### 3. Run the checks before changing the version
 
 ```bash
 npm ci
@@ -143,23 +155,50 @@ npm run audit:ci
 npm run pack:ci
 ```
 
-Create a new version with npm:
+### 4. Bump the version
+
+Run exactly one of these commands:
 
 ```bash
-npm version patch   # 0.1.0 -> 0.1.1
-npm version minor   # 0.1.0 -> 0.2.0
-npm version major   # 0.1.0 -> 1.0.0
+npm version patch   # 0.1.1 -> 0.1.2
+npm version minor   # 0.1.1 -> 0.2.0
+npm version major   # 0.1.1 -> 1.0.0
 ```
 
 `npm version` updates `package.json`, updates `package-lock.json`, creates a Git commit, and creates the matching `vMAJOR.MINOR.PATCH` tag.
 
-Push the commit and tag together:
+Do not push the tag yet. The protected-main workflow requires the version commit to be merged first.
+
+### 5. Run the checks again and push the release branch
 
 ```bash
-git push origin main --follow-tags
+npm run check
+npm run audit:ci
+npm run pack:ci
+
+git push -u origin release/0.1.2
 ```
 
-The release workflow then stages the new version on npm using Trusted Publishing and generates provenance through GitHub Actions OIDC. It does not become publicly installable until a maintainer approves the staged package.
+Open a pull request from the release branch into `main`. Wait for all required checks to pass and obtain the required approval before merging.
+
+### 6. Create the release tag from updated `main`
+
+After the pull request has merged:
+
+```bash
+git checkout main
+git pull --ff-only origin main
+
+node -p "require('./package.json').version"
+git tag -a v0.1.2 -m "Release v0.1.2"
+git push origin v0.1.2
+```
+
+The version printed by `node` must match the tag. For example, `package.json` must contain `0.1.2` before pushing `v0.1.2`.
+
+Pushing the tag triggers the release workflow. It validates the tag, builds and tests the tagged source, audits dependencies, creates the package tarball, and stages the new version on npm using Trusted Publishing and GitHub Actions OIDC.
+
+The package does not become publicly installable until a maintainer approves the staged package.
 
 Review and approve the staged package:
 

@@ -73,7 +73,7 @@ jobs:
       - name: Create release package
         run: npm pack --ignore-scripts --pack-destination release
 
-      - name: Publish to npm with provenance
+      - name: Stage package for npm review
         run: |
           set -euo pipefail
           package_name="$(node -p "require('./package.json').name")"
@@ -81,7 +81,7 @@ jobs:
           if npm view "${package_name}@${package_version}" version --silent >/dev/null 2>&1; then
             echo "${package_name}@${package_version} is already published; skipping duplicate publish."
           else
-            npm publish --provenance --access public
+            npm stage publish
           fi
 
       - name: Create GitHub Release

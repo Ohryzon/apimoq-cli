@@ -102,10 +102,10 @@ Organization or user: Ohryzon
 Repository:          apimoq-cli
 Workflow filename:   release.yml
 Environment:         release
-Permission:          allow npm publish
+Permission:          allow staged publishing only
 ```
 
-Use only `release.yml` as the workflow filename, not the full path. Trusted Publishing uses short-lived OIDC credentials. Do not create or store an npm publish token in GitHub Actions.
+Use only `release.yml` as the workflow filename, not the full path. Trusted Publishing uses short-lived OIDC credentials. Do not create or store an npm publish token in GitHub Actions. Leave direct `npm publish` permission unchecked.
 
 After verifying the configuration, enable:
 
@@ -159,7 +159,17 @@ Push the commit and tag together:
 git push origin main --follow-tags
 ```
 
-The release workflow then publishes the new version to npm using Trusted Publishing and generates provenance through GitHub Actions OIDC.
+The release workflow then stages the new version on npm using Trusted Publishing and generates provenance through GitHub Actions OIDC. It does not become publicly installable until a maintainer approves the staged package.
+
+Review and approve the staged package:
+
+```bash
+npm stage list apimoq-cli
+npm stage view <stage-id>
+npm stage approve <stage-id>
+```
+
+The approval step requires maintainer authentication and two-factor authentication. Review the staged package contents before approving it.
 
 ## Release requirements
 
@@ -184,7 +194,7 @@ If any requirement fails, npm publication does not occur.
 - Do not force-push `main` or release tags.
 - Do not reuse a published npm version.
 - Do not publish from an unreviewed branch.
-- Prefer Trusted Publishing over long-lived npm tokens.
+- Prefer Trusted Publishing with staged publishing over long-lived npm tokens.
 - Review `npm pack --dry-run` output before the first release and whenever package contents change.
 
 ## Useful commands

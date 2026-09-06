@@ -275,7 +275,7 @@ npm version patch
 git push origin main --follow-tags
 ```
 
-The release workflow accepts only `vMAJOR.MINOR.PATCH` tags and requires the tag to match `package.json`. It builds and tests the tagged source, publishes the package to the public npm registry using npm Trusted Publishing/OIDC, and attaches the same tarball to a GitHub Release.
+The release workflow accepts only `vMAJOR.MINOR.PATCH` tags and requires the tag to match `package.json`. It builds and tests the tagged source, stages the package for review using npm Trusted Publishing/OIDC, and attaches the same tarball to a GitHub Release. The package becomes public only after a maintainer approves the staged package on npm.
 
 Repository administrators should protect `main` and `v*.*.*` tags, require the CI, dependency-review, and CodeQL checks, require pull requests and signed commits where applicable, configure npm Trusted Publishing for this repository/workflow, and configure the `release` environment with approval rules. These repository settings cannot be enforced by files in the repository alone.
 

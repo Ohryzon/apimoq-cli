@@ -7,7 +7,7 @@
   "homepage": "https://github.com/Ohryzon/apimoq-cli#readme",
   "bugs": { "url": "https://github.com/Ohryzon/apimoq-cli/issues" },
   "keywords": ["api", "mock", "mock-server", "frontend", "cli", "development"],
-  "publishConfig": { "access": "public", "provenance": true },
+  "publishConfig": { "access": "public" },
   "type": "module",
   "bin": { "apimoq": "./dist/cli/index.js" },
   "files": ["dist", "templates"],

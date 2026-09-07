@@ -71,7 +71,10 @@ jobs:
         run: npm run check
 
       - name: Create release package
-        run: npm pack --ignore-scripts --pack-destination release
+        run: |
+          set -euo pipefail
+          mkdir -p release
+          npm pack --ignore-scripts --pack-destination release
 
       - name: Stage package for npm review
         run: |

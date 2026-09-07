@@ -1,6 +1,6 @@
 {
   "name": "apimoq-cli",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "A lightweight, persistent local API simulator for frontend development.",
   "license": "MIT",
   "repository": {
